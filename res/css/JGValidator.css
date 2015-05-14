@@ -1,0 +1,44 @@
+.fieldErrors{
+	background: #FFF2F2;
+	padding: 5px 25px;
+}
+
+.fieldErrors li{
+	text-align:left;
+}
+
+.showIfSuccess, .showIfError{
+	display: none;
+}
+.fieldErrors{
+	margin: 0;
+}
+.has-error .fieldErrors{
+	color: #A94442;
+}
+
+.has-warning .fieldErrors{
+	color: #8A6D3B;
+}
+.validator-error-list{
+	/*border: 1px solid #F5D7D7;*/
+}
+.flash, .pulse{
+	background:#FCFFE3;
+}
+.show-if-success,.show-if-error{
+	visibility: hidden;
+	display: none;
+}
+.has-error .show-if-error, .has-success .show-if-success{
+	visibility: visible;
+	display: block;
+}
+.show-if-no-fdb{
+	visibility: visible;
+	display: block;
+}
+.has-error .show-if-no-fdb, .has-success .show-if-no-fdb{
+	visibility: hidden;
+	display: none;
+}
