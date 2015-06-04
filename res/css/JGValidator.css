@@ -23,7 +23,7 @@
 .validator-error-list{
 	/*border: 1px solid #F5D7D7;*/
 }
-.jgvalid-input-group .animated{
+.jgvalid-input-group .animated.flash{
 	background:#FCFFE3;
 }
 .show-if-success,.show-if-error{
