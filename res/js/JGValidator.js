@@ -1,5 +1,5 @@
 /**
- * Version 1.0
+ * Version 1.0.1
  * @param $elements
  * @param isLive
  * @param feedback_success
@@ -31,6 +31,8 @@ var JGValidator = function( $elements, isLive, feedback_success, feedback_error 
     
     var ex_function         = "data-validator-function";
     var ex_function_message = "data-validator-function-message";
+
+    var firstInvalidElement = null;
     
     self.input_event    = "blur";
     self.textarea_event = "blur";
@@ -62,95 +64,6 @@ var JGValidator = function( $elements, isLive, feedback_success, feedback_error 
         self.loadAllEventHand();
     };
     
-    self.validate = function( $this ){
-        var isValid = true;
-        $this.closest(".jgvalid-input-group").find(".fieldErrors").remove();                            // rimuovo la lista errori se già esistesse
-        var errors = "";                                                                    // variabile dove raccolgo gli errori riscontrati
-        var value = $this.val();
-        
-        // Controllo gli errori
-        /*
-         * campo richiesto
-         */
-        if( typeof( $this.attr( required ) )!=="undefined" ){
-            if( ""==value.trim() ){
-                isValid = false;
-                errors += self.getFieldError( $this, required_message );
-            }
-        }
-        
-        /*
-         * regex
-         */
-        var inputTxtRegex = $this.attr( regex_regex );
-        if( typeof( inputTxtRegex )!=="undefined" ){
-            var regex = new RegExp( inputTxtRegex );
-            if( !regex.test( value ) ){
-                isValid = false;
-                errors += self.getFieldError( $this, regex_message );
-            }
-        }
-        
-        /*
-         * lunghezza minima
-         */
-        var attrMin_length = $this.attr( min_length );
-        if( typeof( attrMin_length )!=="undefined" ){
-            var nMin_length = parseInt( attrMin_length );
-            if( nMin_length > value.length ){
-                isValid = false;
-                errors += self.getFieldError( $this, min_length_message );
-            }
-        }
-        
-        /*
-         * lunghezza massima
-         */
-        var attrMax_length = $this.attr( max_length );
-        if( typeof( attrMax_length )!=="undefined" ){
-            var nMax_length = parseInt( attrMax_length );
-            if( nMax_length < value.length ){
-                isValid = false;
-                errors += self.getFieldError( $this, max_length_message );
-            }
-        }
-        
-        /*
-         * Funzione custom da eseguire
-         */
-        var attrEx_function = $this.attr( ex_function );
-        
-        if( typeof( attrEx_function )!=="undefined" ){
-            if( !window[attrEx_function]( $this, self ) ){
-                isValid = false;
-                errors += self.getFieldError( $this, ex_function_message );
-            }
-        }
-        
-        if( !isValid ){
-            /*
-             * Se è settato il div dove immettere gli errori lo uso
-             */
-            var $putHereErrors = $this.closest(".jgvalid-input-group").find( nodeOfErrorListElement );
-            
-            if( 0>=$putHereErrors.length ){
-                /*
-                 * altrimenti li appendo dopo l'emento input
-                 */
-                $putHereErrors = $this.closest("div");
-            }
-            $putHereErrors.append( listFieldErrors );                                        // appendo la lista
-            $putHereErrors.children(".fieldErrors").append( errors );                        // appendo i messaggi con gli errori raccolti
-            $this.closest(".jgvalid-input-group").addClass(feedback_error).removeClass(feedback_success);
-
-        }else{
-            $this.closest(".jgvalid-input-group").removeClass(feedback_error).addClass(feedback_success);
-        }
-        
-        return isValid;
-        
-    };
-    
     self.getFieldError = function( $this, nameOfError ){
         var errorMessage = $this.attr( nameOfError );
         if( typeof( errorMessage )==="undefined" ){
@@ -165,17 +78,26 @@ var JGValidator = function( $elements, isLive, feedback_success, feedback_error 
      * 
      * @return true if all elements are valid otherwise false.
      */
-    self.isValidForm = function(animate){
+    self.validate = function(animate){
         var isValid = true;
+        firstInvalidElement = null;
         $elements.each(function(){
             var $this = $( this );
-            if( !self.validate( $this ) ){
+            if( !validateElem( $this ) ){
+
+                if(null==firstInvalidElement)
+                    firstInvalidElement = $this;
+
                 isValid = false;
                 if( typeof animate !== 'undefined' && animate )
                     self.animate($this);
             }
         });
         return isValid;
+    };
+
+    self.getFirstInvalidElement = function(){
+        return firstInvalidElement;
     };
     
     self.showTheseErrorsOnElem = function( nameOfErrorsList, elemFilter ){
@@ -259,7 +181,7 @@ var JGValidator = function( $elements, isLive, feedback_success, feedback_error 
                  * verificardi di ben precisi eventi
                  */
                 $this.on( event, function() {
-                    self.validate( $( this ) );
+                    validateElem( $( this ) );
                 });
                 
                 /**
@@ -277,5 +199,95 @@ var JGValidator = function( $elements, isLive, feedback_success, feedback_error 
         }
         
     };
+
+    var validateElem = function( $this ){
+        var isValid = true;
+        $this.closest(".jgvalid-input-group").find(".fieldErrors").remove();                            // rimuovo la lista errori se già esistesse
+        var errors = "";                                                                    // variabile dove raccolgo gli errori riscontrati
+        var value = $this.val();
+
+        // Controllo gli errori
+        /*
+         * campo richiesto
+         */
+        if( typeof( $this.attr( required ) )!=="undefined" ){
+            if( ""==value.trim() ){
+                isValid = false;
+                errors += self.getFieldError( $this, required_message );
+            }
+        }
+
+        /*
+         * regex
+         */
+        var inputTxtRegex = $this.attr( regex_regex );
+        if( typeof( inputTxtRegex )!=="undefined" ){
+            var regex = new RegExp( inputTxtRegex );
+            if( !regex.test( value ) ){
+                isValid = false;
+                errors += self.getFieldError( $this, regex_message );
+            }
+        }
+
+        /*
+         * lunghezza minima
+         */
+        var attrMin_length = $this.attr( min_length );
+        if( typeof( attrMin_length )!=="undefined" ){
+            var nMin_length = parseInt( attrMin_length );
+            if( nMin_length > value.length ){
+                isValid = false;
+                errors += self.getFieldError( $this, min_length_message );
+            }
+        }
+
+        /*
+         * lunghezza massima
+         */
+        var attrMax_length = $this.attr( max_length );
+        if( typeof( attrMax_length )!=="undefined" ){
+            var nMax_length = parseInt( attrMax_length );
+            if( nMax_length < value.length ){
+                isValid = false;
+                errors += self.getFieldError( $this, max_length_message );
+            }
+        }
+
+        /*
+         * Funzione custom da eseguire
+         */
+        var attrEx_function = $this.attr( ex_function );
+
+        if( typeof( attrEx_function )!=="undefined" ){
+            if( !window[attrEx_function]( $this, self ) ){
+                isValid = false;
+                errors += self.getFieldError( $this, ex_function_message );
+            }
+        }
+
+        if( !isValid ){
+            /*
+             * Se è settato il div dove immettere gli errori lo uso
+             */
+            var $putHereErrors = $this.closest(".jgvalid-input-group").find( nodeOfErrorListElement );
+
+            if( 0>=$putHereErrors.length ){
+                /*
+                 * altrimenti li appendo dopo l'emento input
+                 */
+                $putHereErrors = $this.closest("div");
+            }
+            $putHereErrors.append( listFieldErrors );                                        // appendo la lista
+            $putHereErrors.children(".fieldErrors").append( errors );                        // appendo i messaggi con gli errori raccolti
+            $this.closest(".jgvalid-input-group").addClass(feedback_error).removeClass(feedback_success);
+
+        }else{
+            $this.closest(".jgvalid-input-group").removeClass(feedback_error).addClass(feedback_success);
+        }
+
+        return isValid;
+
+    };
+
     self.loadAllEventHand();
 };
