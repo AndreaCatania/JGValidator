@@ -127,7 +127,6 @@ var JGValidator = function( $elements, isLive ){
     /**
      * If the element isn't animable (not have animated class) set true to add this class.
      * @param $elem
-     * @param isAnimable
      */
     self.animate = function( $elem ){
         // Using animate.css library this snippets provides an animation
@@ -189,14 +188,14 @@ var JGValidator = function( $elements, isLive ){
 
         // Error checking
         if( typeof( $this.attr( required ) )!=="undefined" ){
-            if( ""==value.trim() ){
+            if( null==value || ""==value.trim() ){
                 isValid = false;
                 errors.push(required_message);
             }
         }
 
         // Regex processed only if the value isn't void
-        if( ""!=value.trim() ){
+        if( null!=value && ""!=value.trim() ){
             var inputTxtRegex = $this.attr( regex_regex );
             if( typeof( inputTxtRegex )!=="undefined" ){
                 var regex = new RegExp( inputTxtRegex );
