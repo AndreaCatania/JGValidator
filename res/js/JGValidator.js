@@ -195,12 +195,15 @@ var JGValidator = function( $elements, isLive ){
             }
         }
 
-        var inputTxtRegex = $this.attr( regex_regex );
-        if( typeof( inputTxtRegex )!=="undefined" ){
-            var regex = new RegExp( inputTxtRegex );
-            if( !regex.test( value ) ){
-                isValid = false;
-                errors.push(regex_message);
+        // Regex processed only if the value isn't void
+        if( ""!=value.trim() ){
+            var inputTxtRegex = $this.attr( regex_regex );
+            if( typeof( inputTxtRegex )!=="undefined" ){
+                var regex = new RegExp( inputTxtRegex );
+                if( !regex.test( value ) ){
+                    isValid = false;
+                    errors.push(regex_message);
+                }
             }
         }
 
@@ -223,7 +226,6 @@ var JGValidator = function( $elements, isLive ){
         }
 
         var attrEx_function = $this.attr( ex_function );
-
         if( typeof( attrEx_function )!=="undefined" ){
             if( !window[attrEx_function]( $this, self ) ){
                 isValid = false;
