@@ -185,17 +185,21 @@ var JGValidator = function( $elements, isLive ){
         var   isValid = true
             , errors = []
             , value = $this.val();
+                
+        if(null!=value){
+            value = value.trim();
+        }
 
         // Error checking
         if( typeof( $this.attr( required ) )!=="undefined" ){
-            if( null==value || ""==value.trim() ){
+            if( null==value || ""==value ){
                 isValid = false;
                 errors.push(required_message);
             }
         }
 
         // Regex processed only if the value isn't void
-        if( null!=value && ""!=value.trim() ){
+        if( null!=value && ""!=value ){
             var inputTxtRegex = $this.attr( regex_regex );
             if( typeof( inputTxtRegex )!=="undefined" ){
                 var regex = new RegExp( inputTxtRegex );
