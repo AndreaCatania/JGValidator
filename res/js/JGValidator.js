@@ -187,7 +187,7 @@ var JGValidator = function( $elements, isLive ){
             , value = $this.val();
                 
         if(null!=value){
-            value = value.trim();
+            value = $.trim(value);
         }
 
         // Error checking
