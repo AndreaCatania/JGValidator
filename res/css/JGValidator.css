@@ -1,5 +1,7 @@
 .fieldErrors{
 	padding: 5px 25px;
+	width: 100%;
+	display: inline-block;
 }
 
 .fieldErrors li{
